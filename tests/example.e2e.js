@@ -1,9 +1,7 @@
 const { default: pause } = require('webdriverio/build/commands/browser/pause');
 const LoginPage = require('../test/pageobjects/login.page');
 const SecurePage = require('../test/pageobjects/secure.page');
-var assert = require('chai').assert;
-var expect = require('chai').expect;
-var should = require('chai').should;
+
 //var getHomeTitle = LoginPage.getTitle() ;
 
 describe('My Login application', () => {
