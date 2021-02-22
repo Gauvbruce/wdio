@@ -8,6 +8,7 @@ else {
     baseUrl = 'https://d5g000004gixpeaw-dev-ed.my.salesforce.com/' ;
 }
 
+var timeout = process.env.DEBUG ? 99999999 : 10000 ; 
 
 exports.config = {
     //
@@ -148,7 +149,7 @@ exports.config = {
     // See the full list at http://mochajs.org/
     mochaOpts: {
         ui: 'bdd',
-        timeout: 60000
+        timeout: timeout
     },
     //
     // =====
