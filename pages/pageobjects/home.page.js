@@ -1,14 +1,14 @@
 //ts-check
 
 //const { default: $ } = require('webdriverio/build/commands/browser/$')
-var Page = require('../pageobjects/page')
+const Page = require('./page')
 class HomePage extends Page {
     
 /**
      * define selectors using getter methods
      */
 
-     get inputSearchBox() {return $("//div/input[@class='filter-box input']")} ;
+     get inputSearchBox() {return $("//div/input[placeholder='Quick Find']")} ;
    
     /**
      * a method to encapsule automation code to interact with the page

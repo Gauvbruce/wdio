@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { default: pause } = require('webdriverio/build/commands/browser/pause');
-const LoginPage = require('../test/pageobjects/login.page');
-const SecurePage = require('../test/pageobjects/secure.page');
+const LoginPage = require('../pages/pageobjects/login.page');
+const SecurePage = require('../pages/pageobjects/secure.page');
 
 describe('My second test', () => {
     it('should run this test', () => {

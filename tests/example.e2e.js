@@ -1,19 +1,18 @@
 const { default: pause } = require('webdriverio/build/commands/browser/pause');
-const LoginPage = require('../test/pageobjects/login.page');
-const SecurePage = require('../test/pageobjects/secure.page');
-const HomePage = require('../test/pageobjects/home.page');
-const loginPage = require('../test/pageobjects/login.page');
+const LoginPage = require('../pages/pageobjects/login.page');
+const SecurePage = require('../pages/pageobjects/secure.page');
+const HomePage = require('../pages/pageobjects/home.page');
+const loginPage = require('../pages/pageobjects/login.page');
 
 //var getHomeTitle = LoginPage.getTitle() ;
-beforeEach(function(){
+let userName ='gauvbruce112@gmail.com';
+let password = 'Salesforce@123'
 
-    console.log("Inside the describe block");
-})
 describe('My Login application', () => {
     it('should login with valid credentials', () => {
         LoginPage.open();
         
-        LoginPage.login('gauvbruce112@gmail.com', 'Salesforce@123');
+        LoginPage.login(userName, password);
         //this.timeout(20000);
         //pause(10000);
 
@@ -25,8 +24,8 @@ describe('My Login application', () => {
      
         // expect(SecurePage.flashAlert).toHaveTextContaining(
         //    'You logged into a secure area!');
-       
-        pause(10000) ; 
+       //this.timeout(20000);
+       pause(10000) ; 
 
     });
 });
@@ -42,5 +41,29 @@ it("test case - to check the get css property",()=>{
 
 });
  */
+describe("test API call",()=>{
+    it('This is a API test',()=>{
 
+        let res = request('GET', 'http://jsonplaceholder.typicode.com/posts/1/comments');
+        let contactusDetails = JSON.parse(res.getBody().toString('utf8'));
+        contactusDetails.foreach(function(contactusDetail)
+        {
+            console.log('-----------------------#############################'+contactusDetail.id);
+    
+        })
+
+    })
+
+    it('ALter the width of the video', ()=>{
+        var videowidth  = browser.execute(function(){
+            let video = document.querySelector('#video');
+            return video.style.width = "300px";
+
+        })
+    
+    })   
+} 
+
+
+);
 
