@@ -3,12 +3,13 @@ const LoginPage = require('../pages/pageobjects/login.page');
 const SecurePage = require('../pages/pageobjects/secure.page');
 const HomePage = require('../pages/pageobjects/home.page');
 const loginPage = require('../pages/pageobjects/login.page');
+const util = require('../util/elementUtil');
 
 //var getHomeTitle = LoginPage.getTitle() ;
 let userName ='gauvbruce112@gmail.com';
 let password = 'Salesforce@123'
 
-describe('My Login application', () => {
+describe.only('My Login application', () => {
     it('should login with valid credentials', () => {
         LoginPage.open();
         

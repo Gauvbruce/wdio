@@ -1,4 +1,5 @@
 const Page = require('./page');
+const util = require('../../util/elementUtil');
 
 /**
  * sub page containing specific selectors and methods for a specific page
@@ -18,10 +19,12 @@ class LoginPage extends Page {
      * e.g. to login using username and password
      */
     login(username, password) {
-        
-        this.inputUsername.setValue(username);
-        this.inputPassword.setValue(password);
-        this.btnSubmit.click();
+        util.doSetValue(this.inputUsername,username);
+        util.doSetValue(this.inputPassword, password);
+        util.doClick(this.btnSubmit);
+      //  this.inputUsername.setValue(username);
+      //  this.inputPassword.setValue(password);
+      //  this.btnSubmit.click();
     }
 
     /**
