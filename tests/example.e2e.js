@@ -3,14 +3,26 @@ const LoginPage = require('../pages/pageobjects/login.page');
 const SecurePage = require('../pages/pageobjects/secure.page');
 const HomePage = require('../pages/pageobjects/home.page');
 const loginPage = require('../pages/pageobjects/login.page');
-const util = require('../util/elementUtil');
+const util = require('../util/common');
+const { assert } = require('chai');
 
 //var getHomeTitle = LoginPage.getTitle() ;
 let userName ='gauvbruce112@gmail.com';
 let password = 'Salesforce@123'
 
 describe.only('My Login application', () => {
+    
+    
+    beforeEach(() => {
+        browser.maximizeWindow();
+        //browser.setWindowSize(1280, 870);
+      })
+
+
     it('should login with valid credentials', () => {
+        AllureReporter.addTestId("https://jiralink/browse/.... ")
+        AllureReporter.addFeature("Login")
+       
         LoginPage.open();
         
         LoginPage.login(userName, password);
@@ -18,8 +30,10 @@ describe.only('My Login application', () => {
         //pause(10000);
 
         //assert.match($(LoginPage.getTitle()), 'Home | Salesforce', 'User is on the homepage');
+        browser.setTimeout({ 'pageLoad': 10000 })
         
-        expect(LoginPage.getTitle()).to.equal('Lightning Experience') ; 
+        expect(LoginPage.getTitle()).to.equal('Lightning Experience') ;
+       
         //(LoginPage.getTitle()).should.equal('Lightning Experience');
         //expect(SecurePage.flashAlert).toBeExisting();
      

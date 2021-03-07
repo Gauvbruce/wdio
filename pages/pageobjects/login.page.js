@@ -1,5 +1,5 @@
 const Page = require('./page');
-const util = require('../../util/elementUtil');
+const util = require('../../util/common');
 
 /**
  * sub page containing specific selectors and methods for a specific page

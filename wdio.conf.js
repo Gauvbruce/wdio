@@ -1,16 +1,49 @@
-var baseUrl; 
+const allure = require('@wdio/allure-reporter').default
+const reportportal = require('wdio-reportportal-reporter');
+const RpService = require("wdio-reportportal-service");
+const path = require('path');
+const fs = require('fs');
+const { LEVEL } = require('wdio-reportportal-reporter/build/constants');
+const { assert } = require('console');
+const { default: AllureReporter } = require('@wdio/allure-reporter')
 
-if(process.env.SERVER === 'prod'){
+global.downloadDir = path.join(__dirname, 'tempDownload');
 
-    baseUrl = 'http:www.google.com' ; 
-}
-else {
-    baseUrl = 'https://d5g000004gixpeaw-dev-ed.my.salesforce.com/' ;
-}
 
-var timeout = process.env.DEBUG ? 99999999 : 10000 ; 
+const conf = {
+    reportPortalClientConfig: { // report portal settings
+        token: '',
+        endpoint: '',
+        launch: '',
+        project: '',
+        mode: '',
+        debug: '',
+        description: "",
+        // attributes: [{ key: "tag", value: "foo" }],
+        //headers: { "foo": "bar" } // optional headers for internal http client
+    },
+    reportSeleniumCommands: false, // add selenium commands to log
+    seleniumCommandsLogLevel: 'debug', // log level for selenium commands
+    autoAttachScreenshots: false, // automatically add screenshots
+    screenshotsLogLevel: 'info', // log level for screenshots
+    parseTagsFromTestTitle: false, // parse strings like `@foo` from titles and add to Report Portal
+    cucumberNestedSteps: false, // report cucumber steps as Report Portal steps
+    autoAttachCucumberFeatureToScenario: false, // requires cucumberNestedSteps to be true for use
+    isSauseLabRun: false,// automatically add SauseLab ID to rp tags.
+    attachPicturesToLogs: true
+};
+
 
 exports.config = {
+    parentUserName: "",
+
+    parentPassword: "",
+
+    environment: "",
+
+    testserviceBaseApi: '',
+    apiAuthToken: '',
+
     //
     // ====================
     // Runner Configuration
@@ -29,7 +62,9 @@ exports.config = {
     // directory is where your package.json resides, so `wdio` will be called from there.
     //
     specs: [
-        './tests/**/*.js'
+        //'./test/specs/**/*.js'
+        'tests/*.js'
+        //'./test/specs/RequestAccomodation.js',
     ],
     // Patterns to exclude.
     exclude: [
@@ -51,25 +86,35 @@ exports.config = {
     // and 30 processes will get spawned. The property handles how many capabilities
     // from the same test should run tests.
     //
-    maxInstances: 15,
+    maxInstances: 5,
     //
     // If you have trouble getting all important capabilities together, check out the
     // Sauce Labs platform configurator - a great tool to configure your capabilities:
     // https://docs.saucelabs.com/reference/platforms-configurator
     //
     capabilities: [{
-    
+
         // maxInstances can get overwritten per capability. So if you have an in-house Selenium
         // grid with only 5 firefox instances available you can make sure that not more than
         // 5 instances get started at a time.
-        maxInstances: 15,
+        maxInstances: 5,
         //
         browserName: 'chrome',
-        acceptInsecureCerts: true
+        browserVersion: '88.0',
+        acceptInsecureCerts: true,
         // If outputDir is provided WebdriverIO can capture driver session logs
         // it is possible to configure which logTypes to include/exclude.
         // excludeDriverLogs: ['*'], // pass '*' to exclude all driver session logs
         // excludeDriverLogs: ['bugreport', 'server'],
+        'goog:chromeOptions': {
+            // args: ['--headless', '--disable-gpu'],
+            prefs: {
+                'headless': true,
+                'directory_upgrade': true,
+                'prompt_for_download': false,
+                'download.default_directory': downloadDir
+            }
+        }
     }],
     //
     // ===================
@@ -102,14 +147,27 @@ exports.config = {
     // with `/`, the base url gets prepended, not including the path portion of your baseUrl.
     // If your `url` parameter starts without a scheme or `/` (like `some/path`), the base url
     // gets prepended directly.
-    baseUrl: baseUrl,
+    baseUrl: 'https://d5g000004gixpeaw-dev-ed.my.salesforce.com/',
+
+    internalToolUrl: '',
+
+    internalToolUser: '',
+
+    internalToolPassword: '',
+
+
+
     //
     // Default timeout for all waitFor* commands.
     waitforTimeout: 10000,
     //
     // Default timeout in milliseconds for request
     // if browser driver or grid doesn't send response
-    connectionRetryTimeout: 120000,
+    connectionRetryTimeout: 90000,
+
+    //implicit: 1200000,
+
+    script: 1200000,
     //
     // Default request retries count
     connectionRetryCount: 3,
@@ -118,11 +176,11 @@ exports.config = {
     // Services take over a specific job you don't want to take care of. They enhance
     // your test setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the test process.
-    services: ['selenium-standalone'],
-    
+    services: ['chromedriver', 'selenium-standalone', [RpService, {}]],
+
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber
-    // see also: https://webdriver.io/docs/frameworks
+    // see also: https://webdriver.io/docs/frameworks.html
     //
     // Make sure you have the wdio adapter package for the specific framework installed
     // before running any tests.
@@ -139,18 +197,39 @@ exports.config = {
     //
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
-    // see also: https://webdriver.io/docs/dot-reporter
-    reporters: ['spec',['allure', {outputDir: 'allure-results'}]],
+    // see also: https://webdriver.io/docs/dot-reporter.html
+    reporters: ['spec'],
 
 
-    
+
     //
     // Options to be passed to Mocha.
     // See the full list at http://mochajs.org/
     mochaOpts: {
-        ui: 'bdd',
-        timeout: timeout
+        //ui: 'bdd',
+        timeout: 1200000,
+        // colors: true,
+        // reporter: '@reportportal/agent-js-mocha',
+        // reporterOptions: {
+        //     // client settings
+        //     token: "6d8eb41b-063b-489e-bec1-880300b89c87",
+        //     endpoint: "http://localhost:8081/api/v1",
+        //     launch: "dev",
+        //     project: "ema",
+        //     // agent settings
+        //     attachScreenshots: true,
+        //     showPassedHooks: false
+        // },
+        // timeout: 600000
     },
+
+    // token: '6d8eb41b-063b-489e-bec1-880300b89c87',
+    // endpoint: 'http://localhost:8080/api/v1',
+    // launch: 'vishal.srivastava_TEST_EXAMPLE',
+    // project: 'ema',
+    // mode: 'DEFAULT',
+    // debug: false,
+    // description: "Launch description text",
     //
     // =====
     // Hooks
@@ -164,8 +243,13 @@ exports.config = {
      * @param {Object} config wdio configuration object
      * @param {Array.<Object>} capabilities list of capabilities details
      */
-    // onPrepare: function (config, capabilities) {
-    // },
+    onPrepare: function (config, capabilities) {
+        // make sure download directory exists
+        if (!fs.existsSync(downloadDir)) {
+            // if it doesn't exist, create it
+            fs.mkdirSync(downloadDir);
+        }
+    },
     /**
      * Gets executed before a worker process is spawned and can be used to initialise specific service
      * for that worker as well as modify runtime environments in an async fashion.
@@ -190,14 +274,29 @@ exports.config = {
      * Gets executed before test execution begins. At this point you can access to all global
      * variables like `browser`. It is the perfect place to define custom commands.
      * @param {Array.<Object>} capabilities list of capabilities details
-     * @param {Array.<String>} specs        List of spec file paths that are to be run
-     * @param {Object}         browser      instance of created browser/device session
+     * @param {Array.<String>} specs List of spec file paths that are to be run
      */
-     before: function (capabilities, specs) {
-         assert = require('chai').assert;
-         expect = require('chai').expect;
-         should = require('chai').should;
-     },
+    before: function (capabilities, specs) {
+        // browser.windowHandleSize({ width: 1280, height: 800 });
+        require('expect-webdriverio');
+        global.wdioExpect = global.expect;
+        const chai = require('chai');
+        global.expect = chai.expect;
+        global.environment = "dev"
+        global.mscrmConfig = this.mscrmconfig
+        global.baseUrl = this.baseUrl
+        global.parentUser = this.parentUserName
+        global.parentPassword = this.parentPassword
+        global.reporter = reportportal
+        global.internalToolUrl = this.internalToolUrl
+        global.internalToolUser = this.internalToolUser
+        global.internalToolPassword = this.internalToolPassword
+        global.LEVEL = LEVEL
+        global.testserviceBaseApi = this.testserviceBaseApi
+        global.apiAuthToken = this.apiAuthToken
+        global.AllureReporter = AllureReporter
+
+    },
     /**
      * Runs before a WebdriverIO command gets executed.
      * @param {String} commandName hook command name
@@ -227,17 +326,48 @@ exports.config = {
      * afterEach in Mocha)
      */
     // afterHook: function (test, context, { error, result, duration, passed, retries }) {
+    //     if (error) {
+    //         const filename = "screnshot.png";
+    //         const outputFile = path.join(__dirname, filename);
+    //         browser.saveScreenshot(outputFile);
+    //         reportportal.sendFileToTest(test, 'info', filename, fs.readFileSync(outputFile));
+    //     }
     // },
     /**
      * Function to be executed after a test (in Mocha/Jasmine).
      */
-    afterTest: function(test, context, { error, result, duration, passed, retries }) {
-        if (!passed) {
+    // afterTest: function(test, context, { error, result, duration, passed, retries }) {
+    // },
+
+    afterTest: function (
+        test,
+        context,
+        { error, result, duration, passed, retries }
+    ) {
+        // take a screenshot anytime a test fails and throws an error
+        if (error) {
             browser.takeScreenshot();
+            // const filename = "screnshot.png";
+            // const outputFile = path.join(__dirname, filename);
+            // browser.saveScreenshot(outputFile);
+            // reportportal.sendFileToTest(test, 'info', filename, fs.readFileSync(outputFile));
+
         }
     },
+    // afterScenario: function (uri, feature, scenario, result, sourceLocation) {
+    //     if (result.status === 'failed') {
+    //       browser.takeScreenshot();
+    //     }
+    //   },
 
-
+    // afterTest(test) {
+    //     if (test.passed === false) {
+    //       const filename = "screnshot.png";
+    //       const outputFile = path.join(__dirname, filename);
+    //       browser.saveScreenshot(outputFile);
+    //       reportportal.sendFileToTest(test, 'info', filename, fs.readFileSync(outputFile));
+    //     }
+    //   },
     /**
      * Hook that gets executed after the suite has ended
      * @param {Object} suite suite details
@@ -251,8 +381,18 @@ exports.config = {
      * @param {Number} result 0 - command success, 1 - command error
      * @param {Object} error error object if any
      */
-    // afterCommand: function (commandName, args, result, error) {
-    // },
+    afterCommand: function (commandName, args, result, error) {
+        // console.log(args)
+        // reportportal.sendLog(LEVEL.INFO, commandName)
+        if (error) {
+            const filename = "screnshot.png";
+            const outputFile = path.join(__dirname, filename);
+            browser.saveScreenshot(outputFile);
+
+            reportportal.sendFile(LEVEL.ERROR, filename, fs.readFileSync(outputFile));
+            this.expect(assert.fail())
+        }
+    },
     /**
      * Gets executed after all tests are done. You still have access to all global variables from
      * the test.
@@ -278,8 +418,9 @@ exports.config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {<Object>} results object containing test results
      */
-    // onComplete: function(exitCode, config, capabilities, results) {
-    // },
+    onComplete: function (exitCode, config, capabilities, results) {
+        rmdir(downloadDir)
+    },
     /**
     * Gets executed when a refresh happens.
     * @param {String} oldSessionId session ID of the old session
@@ -287,4 +428,62 @@ exports.config = {
     */
     //onReload: function(oldSessionId, newSessionId) {
     //}
+    // ...
+
+    reporters:
+        [['allure', {
+            outputDir: 'allure-results',
+            disableWebdriverStepsReporting: true,
+            disableWebdriverScreenshotsReporting: false,
+        }],
+            'teamcity',
+        [reportportal, conf]
+
+        ],
+    reporterOptions: {
+        captureStandardOutput: true, // optional
+        flowId: true, // optional
+        message: '[title]', // optional
+    },
+
+    beforeSuite: function (suite) {
+        global.allure = allure;
+        allure.addFeature(suite.name);
+        allure.addDescription("generating Allure reports " + suite.name);
+    },
+    beforeTest: function (test, context) {
+        allure.addEnvironment("BROWSER", "Chrome");
+        allure.addEnvironment("BROWSER_VERSION", "88");
+        allure.addEnvironment("PLATFORM", "Windows");
+        allure.addDescription(test.title);
+        allure.addEnvironment("TestEnvironment", "DEV")
+        // allure.addTestId("TC-001" + test.title);
+        // allure.addLabel("label" + + today.toISOString().replace(/[^\w]/g, "") + ".png");
+    },
+
+    plugins: { 'wdio-screenshot': {} }
+
+
+
+
+    // ...
+}
+
+function rmdir(dir) {
+    var list = fs.readdirSync(dir);
+    for (var i = 0; i < list.length; i++) {
+        var filename = path.join(dir, list[i]);
+        var stat = fs.statSync(filename);
+
+        if (filename == "." || filename == "..") {
+            // pass these files
+        } else if (stat.isDirectory()) {
+            // rmdir recursively
+            rmdir(filename);
+        } else {
+            // rm fiilename
+            fs.unlinkSync(filename);
+        }
+    }
+    fs.rmdirSync(dir);
 }
