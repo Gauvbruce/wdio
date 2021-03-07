@@ -9,7 +9,7 @@
     "cleanresult": "rm -rf allure-results",
     "test:selenium": "selenium-standalone start",
     "test:mocha": "sleep 1 && multi='progress=- mocha-allure-reporter=-' mocha",
-    "test": "wdio",
+    "test": "node_modules/.bin/wdio wdio.conf.js",
     "dev": "node_modules/.bin/wdio ./test/configs/ui/wdio.dev.conf.js",
     "feature5": "node_modules/.bin/wdio ./test/configs/ui/wdio.feature5.conf.js",
     "feature4": "node_modules/.bin/wdio ./test/configs/ui/wdio.feature4.conf.js",

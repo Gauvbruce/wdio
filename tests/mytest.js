@@ -19,7 +19,7 @@ describe('My second test', () => {
         LoginPage.login('gauvbruce112@gmail.com', 'Salesforce@123');
        // pause(10000);
        //assert.equal($(LoginPage.getTitle()), 'Lightning Experience', 'User is on the homepage');
-       browser.setTimeout({ 'pageLoad': 10000 })
+       //browser.setTimeout({ 'pageLoad': 10000 })
        expect(LoginPage.getTitle()).to.equal('Lightning Experience');
         //AllureReporter(loginPage.getTitle());
         //expect(SecurePage.flashAlert).toBeExisting();

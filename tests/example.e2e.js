@@ -30,10 +30,10 @@ describe.only('My Login application', () => {
         //pause(10000);
 
         //assert.match($(LoginPage.getTitle()), 'Home | Salesforce', 'User is on the homepage');
-        browser.setTimeout({ 'pageLoad': 10000 })
-        
-        expect(LoginPage.getTitle()).to.equal('Lightning Experience') ;
        
+
+        expect(LoginPage.getTitle()).to.equal('Lightning Experience') ;
+        console.log(LoginPage.getTitle()) ; 
         //(LoginPage.getTitle()).should.equal('Lightning Experience');
         //expect(SecurePage.flashAlert).toBeExisting();
      
